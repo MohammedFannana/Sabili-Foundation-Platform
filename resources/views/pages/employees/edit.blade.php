@@ -8,7 +8,7 @@
 
 
         {{-- section header component --}}
-        <h3 class="mb-5"> إضافة موظف </h3>
+        <h3 class="mb-5"> تعديل بيانات الموظف </h3>
 
 
 
@@ -17,8 +17,9 @@
             <div class="mt-4 mb-4 row">
 
 
-                <form action="{{route('employee.store')}}" method="post" enctype="multipart/form-data">
+                <form action="{{route('employee.update' , $employee->id)}}" method="post" enctype="multipart/form-data">
                     @csrf
+                    @method('PUT')
 
                     <div class="row">
 
@@ -92,7 +93,6 @@
                         </div>
 
                     </div>
-
 
                 </form>
 

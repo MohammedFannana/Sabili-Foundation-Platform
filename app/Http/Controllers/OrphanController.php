@@ -46,6 +46,8 @@ class OrphanController extends Controller
 
         $validated['role'] = 'registered';
 
+        // dd($validated);
+
         try {
             DB::beginTransaction();
 
@@ -95,39 +97,46 @@ class OrphanController extends Controller
                     $path = $file->store("images/orphans/{$request->name}", 'public');
                     $imageData[$field] = $path;
                 } else {
-                    $imageData[$field] = null;  // أو قيمة افتراضية
+                    $imageData[$field] = null;  
                 }
             }
 
             $orphan->image()->create($imageData);
 
             // إنشاء بيانات الإخوة
-            $brotherCount = count($request->brother_name ?? []);
+            // $brotherCount = count($request->brother_name ?? []);
 
-            for ($i = 0; $i < $brotherCount; $i++) {
+            $brotherNames = $request->brother_name ?? [];
+
+            foreach ($brotherNames as $i => $brotherName) {
+                // تجاهل القيم null أو الفراغات
+                if (is_null($brotherName) || trim($brotherName) === '') {
+                    continue;
+                }
+
                 $medicalReportPath = null;
-
                 if ($request->hasFile("brother_medical_report.$i")) {
                     $file = $request->file("brother_medical_report")[$i];
                     $medicalReportPath = $file->store("images/orphans/{$orphan->name}/brothers", 'public');
                 }
 
-
                 $orphan->brothers()->create([
-                    'brother_name'          => $request->brother_name[$i],
-                    'brother_id_number'     => $request->brother_id_number[$i],
-                    'brother_gender'        => $request->brother_gender[$i],
-                    'brother_birth_date'    => $request->brother_birth_date[$i],
-                    'brother_health_status' => $request->brother_health_status[$i],
+                    'brother_name'          => $brotherName,
+                    'brother_id_number'     => $request->brother_id_number[$i] ?? null,
+                    'brother_gender'        => $request->brother_gender[$i] ?? null,
+                    'brother_birth_date'    => $request->brother_birth_date[$i] ?? null,
+                    'brother_health_status' => $request->brother_health_status[$i] ?? null,
                     'brother_medical_report'=> $medicalReportPath,
                 ]);
             }
+
 
             DB::commit();
             return redirect()->back()->with('success', __('تمت إضافة اليتيم بنجاح'));
 
         }catch(Exception $e){
             DB::rollBack();
+            // dd($e);
 
             logger()->error('فشل في تسجيل اليتيم: ' . $e->getMessage());
             logger()->error($e->getTraceAsString()); // لتسجيل السطر والمصدر
@@ -161,7 +170,9 @@ class OrphanController extends Controller
      */
     public function update(UpdateOrphanRequest $request, Orphan $orphan)
     {
-        $validated = $request->validate();
+        $validated = $request->validated();
+
+        // dd($validated);
 
 
         $fields = [
@@ -179,22 +190,21 @@ class OrphanController extends Controller
             // معالجة صور اليتيم
             foreach ($fields as $field) {
                 if ($request->hasFile($field)) {
-                    // تخزين الصورة الجديدة أولاً
                     $file = $request->file($field);
-                    $newPath = $file->store("images/orphans/{$request->name}", 'public');
+                    $newPath = $file->store("images/orphans/{$orphan->name}", 'public');
 
-                    // حذف الصورة القديمة بعد حفظ الصورة الجديدة
-                    if ($orphan->$field) {
-                        Storage::disk('public')->delete($orphan->$field);
+                    // احذف القديم إذا موجود
+                    if ($orphan->images && $orphan->images->$field) {
+                        Storage::disk('public')->delete($orphan->images->$field);
                     }
 
-                    $validated[$field] = $newPath;
-
-                } else {
-                    // لا يوجد ملف جديد => نحتفظ بالصورة القديمة
-                    $validated[$field] = $orphan->$field;
+                    // حدث المسار الجديد
+                    $orphan->image()->update([
+                        $field => $newPath
+                    ]);
                 }
             }
+
 
             // الحقول التي لا نريد تعديلها مباشرة (نستثنيها)
             $excludedFields = [
@@ -232,23 +242,21 @@ class OrphanController extends Controller
 
             $brotherCount = count($request->brother_name ?? []);
 
-            // فكرة التحديث:
-            // - إذا كان عدد الإخوة الحالي لا يساوي السابق، نمسح الكل القديم ثم نعيد الإدخال
-            // - أو يمكن تعديل المنطق حسب الحاجة (هنا نستخدم حذف الكل ثم إضافة جديد)
 
-            // حذف الإخوة الحاليين (قبل إعادة الإضافة)
-            foreach ($originalBrothers as $oldBrother) {
 
-            }
             $orphan->brothers()->delete();
 
             // إعادة إضافة بيانات الإخوة مع حذف الصور القديمة عند رفع ملفات جديدة
             for ($i = 0; $i < $brotherCount; $i++) {
+
+                if (empty($request->brother_name[$i])) {
+                    continue;
+                }
+
                 $medicalReportPath = null;
 
                 if ($request->hasFile("brother_medical_report.$i")) {
                     // حذف ملف التقرير الطبي القديم (إن وجد)
-                    // يجب التأكد أن لدينا أخ قديم مطابق للـ $i
 
                     if (isset($originalBrothers[$i]) && $originalBrothers[$i]->brother_medical_report) {
                         Storage::disk('public')->delete($originalBrothers[$i]->brother_medical_report);
@@ -279,6 +287,7 @@ class OrphanController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            dd($e);
             return redirect()->back()->with('danger', __('فشل في تحديث بيانات اليتيم. يرجى المحاولة مرة أخرى.'));
         }
     }

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Orphan;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use App\Notifications\OrphanEmailNotification;
 use Exception;
+use Carbon\Carbon;
+use App\Models\Orphan;
+use App\Models\Sponsorship;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\OrphanEmailNotification;
+
 
 class ActionOrphanController extends Controller
 {
@@ -71,8 +73,8 @@ class ActionOrphanController extends Controller
         $validated = $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'integer|exists:orphans,id',
-            'amount' => 'required|string',
-            'duration'=> 'required|numeric|min:1'
+            // 'amount' => 'required|string',
+            // 'duration'=> 'required|numeric|min:1'
         ]);
 
 
@@ -86,20 +88,19 @@ class ActionOrphanController extends Controller
 
                     $orphan->update(['role' => 'sponsored']);
 
-                    $orphan->sponsorships()->create([
-                        'duration' => $validated['duration'],
-                        'amount' => $validated['amount'],
-                        // 'start_date' => now(),
-                        'role' => 'active',
-                        'status' => 'لم يتم التسليم'
-                    ]);
+                    // $orphan->sponsorships()->create([
+                    //     'duration' => $validated['duration'],
+                    //     'amount' => $validated['amount'],
+                    //     // 'start_date' => now(),
+                    //     'role' => 'active',
+                    //     'status' => 'لم يتم التسليم'
+                    // ]);
 
 
                     DB::commit();
 
                 }catch(Exception $e){
                     DB::rollBack();
-                    dd($e);
                     return redirect()->back()->with('error' , 'فشل تحويل اليتيم الى قائمة الأيتام المكفولين');
                 }
 
@@ -109,7 +110,38 @@ class ActionOrphanController extends Controller
             }
         }
 
-        return back()->with('success', 'تم كفالة الأيتام بنجاح');
+        return back()->with('success', 'تم تحويل اليتيم الى قائمة الأيتام المكفولين بنجاح');
+    }
+
+    public function addSponsorship(Request $request)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|string',
+            'duration' => 'required|array',
+            'duration.*'=> 'required|numeric|min:1'
+        ]);
+
+        $orphans = Orphan::where('role', 'sponsored')->get();
+
+        $currentYear = now()->year;
+
+        foreach ($orphans as $orphan) {
+            foreach ($validated['duration'] as $monthNumber) {
+                // تحديد تاريخ بداية الكفالة
+                $startDate = Carbon::create($currentYear, $monthNumber, 1);
+
+                Sponsorship::create([
+                    'orphan_id' => $orphan->id,
+                    'amount'    => $validated['amount'],
+                    'duration'  => 1, // كل سجل يمثل شهر واحد
+                    'role'      => 'active',
+                    'status'    => 'لم يتم التسليم',
+                    'start_date'=> $startDate,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'تم إضافة الكفالة بنجاح');
     }
 
 
@@ -142,25 +174,51 @@ class ActionOrphanController extends Controller
         $searchBys = $request->input('search_by', []);
         $conditions = $request->input('condition', []);
         $values = $request->input('search_value', []);
+        $from = $request->input('from');
 
 
-        foreach ($searchBys as $index => $field) {
-            $condition = $conditions[$index] ?? '==';
-            $value = $values[$index] ?? null;
 
-            if ($value !== null && $value !== '') {
-                // فقط شرط تطابق دقيق (==)
-                if ($condition == '==') {
-                    $query->where($field, $value);
-                }
-                // يمكن إضافة شروط أخرى هنا لو تحتاج (مثل like, >, < ...)
+        $isSearch = collect($values)->filter(function ($value) {
+            return $value !== null && $value !== '';
+        })->isNotEmpty();
+
+        if ($isSearch) {
+
+            if ($from === 'adopted_page') {
+                $query->where('role', 'certified');
+            } elseif ($from === 'auditing_addition_page') {
+                $query->where('role', 'registered');
+            }elseif ($from === 'waiting_page') {
+                $query->where('role', 'waiting');
+            }elseif ($from === 'sponsorship_page') {
+
+                $query->where('role', 'sponsored');
             }
+
+            foreach ($searchBys as $index => $field) {
+                $condition = $conditions[$index] ?? '==';
+                $value = $values[$index] ?? null;
+
+                if ($value !== null && $value !== '') {
+                    // فقط شرط تطابق دقيق (==)
+                    if ($condition == '==') {
+                        $query->where($field, $value);
+                    }
+                    // يمكن إضافة شروط أخرى هنا لو تحتاج (مثل like, >, < ...)
+                }
+            }
+
+            $orphans = $query->paginate(15)->appends($request->query());
+
+
+        } else {
+            // بدون بحث نمرر paginator فارغ
+            $orphans = null;
         }
 
-        $orphans = $query->paginate(15)->appends($request->query());
         // dd($orphans);
 
-        return view('pages.orphans.create-query', compact('orphans', 'searchBys', 'conditions', 'values'));
+        return view('pages.orphans.create-query', compact('orphans', 'searchBys', 'conditions', 'values' , 'from'));
     }
 
     public function sendEmail(Request $request)
@@ -186,6 +244,21 @@ class ActionOrphanController extends Controller
 
         return back()->with('success', 'تم إرسال البريد الإلكتروني بنجاح .');
     }
+
+    public function archivedOrphan($id)
+    {
+        $orphan = Orphan::findOrFail($id);
+
+        if ($orphan->role !== 'sponsored') {
+            return redirect()->back()->with('error', 'لا يمكن أرشفة هذا اليتيم لأنه ليس مكفولاً.');
+        }
+
+        $orphan->update(['role' => 'archive']);
+
+        return redirect()->back()->with('success', 'تم أرشفة اليتيم بنجاح.');
+    }
+
+
 
 
 

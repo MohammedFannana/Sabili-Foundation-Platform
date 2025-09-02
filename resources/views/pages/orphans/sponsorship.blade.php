@@ -31,7 +31,120 @@
         {{-- section header component --}}
         <div>
 
-            <h3 class="mb-5"> توزيع الكفالات </h3>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                <h3> توزيع الكفالات </h3>
+                <button class="submit-btn" data-bs-toggle="modal" data-bs-target="#staticBackdrop1">إضافة كفالة </button>
+            </div>
+
+            <div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content p-4">
+                        <div class="modal-header justify-content-center border-bottom-0">
+                            <h1 class="modal-title fs-5"> بيانات الكفالة </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body border-bottom-0">
+                            <form action="{{route('sponsorship.create')}}" method="POST">
+                                @csrf
+
+                                <div>
+                                    <label for=""> أشهر الكفالة </label>
+                                    <div class="">
+
+                                        <div class="d-flex align-items-center">
+
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="1" id="month_1">
+                                                <label for="month_1">شهر 1</label>
+                                            </div>
+
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="2" id="month_2">
+                                                <label for="month_2">شهر 2</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center">
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="3" id="month_3">
+                                                <label for="month_3">شهر 3</label>
+                                            </div>
+
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="4" id="month_4">
+                                                <label for="month_4">شهر 4 </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center">
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="5" id="month_5">
+                                                <label for="month_5">شهر 5</label>
+                                            </div>
+
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="6" id="month_6">
+                                                <label for="month_6">شهر 6</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center">
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="7" id="month_7">
+                                                <label for="month_7">شهر 7</label>
+                                            </div>
+
+
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="8" id="month_8">
+                                                <label for="month_8">شهر 8</label>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="d-flex align-items-center">
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="9" id="month_9">
+                                                <label for="month_9">شهر 9</label>
+                                            </div>
+
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="10" id="month_10">
+                                                <label for="month_10">شهر 10</label>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="d-flex align-items-center">
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="11" id="month_11">
+                                                <label for="month_11">شهر 11</label>
+                                            </div>
+
+                                            <div class="w-50">
+                                                <input type="checkbox" name="duration[]" value="12" id="month_12">
+                                                <label for="month_12">شهر 12</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="mb-3">
+                                    <x-form.input name="amount" type="text" label="قيمة الكفالة الشهرية" />
+                                </div>
+
+
+                                <button type="submit" class="submit-btn mt-3 w-100">تأكيد</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
             <p style="color: rgba(36, 36, 36, 0.6);font-size:16px">
                 يمكنك البحث بكود اليتيم لتوزيع الكفالات المستحقة.
             </p>
@@ -152,13 +265,29 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
-                            <div class="modal-body border-0 fw-bold text-center fs-5">
-                                هل أنت متأكد من تسليم الكفالة؟
+                            <div>
+
+                                <div class="modal-body border-0 fw-bold text-center fs-5">
+                                    هل أنت متأكد من تسليم الكفالة؟
+                                </div>
+
                             </div>
 
                             <div class="modal-body border-bottom-0">
                                 <form class="mb-3" action="{{route('orphans.sponsorship.delivery')}}" method="post" enctype="multipart/form-data">
                                     @csrf
+
+                                    <div class="col-12  mb-4">
+                                        <label class="mb-2 fw-bold">  إيصال الدفع
+                                            <span class="text-danger">*</span>
+                                        </label> <br>
+                                        <label for="payment_receipt1" class="custom-file-upload text-center w-100" style="color:#777a78;">
+                                            <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
+                                            اسحب الملف هنا أو اضغط لاختياره
+                                        </label>
+                                        <x-form.input name="payment_receipt" class="hidden-file-style" type="file" id="payment_receipt1" style="display: none;"/>
+                                    </div>
+
                                     <input type="hidden" name="sponsorship_ids" id="selected-sponsorship-ids">
                                     <button type="submit" class="submit-btn mt-3 w-100">تأكيد التسليم</button>
                                 </form>
@@ -180,7 +309,6 @@
                                 <th scope="col"> من  </th>
                                 <th scope="col"> إلى  </th>
                                 <th scope="col">  المبلغ الشهري</th>
-                                <th scope="col">المبلغ الإجمالي </th>
                                 <th scope="col"> الحالة </th>
                                 <th scope="col" style="border-top-left-radius:15px">الاجراء</th>
                             </tr>
@@ -201,17 +329,21 @@
                                     @endif
 
                                     @php
-
-                                        $startDate = \Carbon\Carbon::now();; // تاريخ اليوم
+                                        if($sponsorship->start_date){
+                                            $startDate = \Carbon\Carbon::parse($sponsorship->start_date);
+                                        }else {
+                                            $startDate = \Carbon\Carbon::now();
+                                        }
                                         $endDate = $startDate->copy()->addMonths($sponsorship->duration); // تاريخ النهاية حسب المدة
                                     @endphp
 
                                     <td>{{ $sponsorship->duration }}</td>
-                                    <td>{{ $startDate->format('Y-m-d') }}</td> 
+                                        <td>
+                                            @if ($sponsorship->start_date) {{$sponsorship->start_date}} @else {{ $startDate->format('Y-m-d') }} @endif
+                                        </td>
                                     <td>{{ $endDate->format('Y-m-d') }}</td>
 
                                     <td> {{$sponsorship->amount}} </td>
-                                    <td> {{ number_format(floatval($sponsorship->amount) * intval($sponsorship->duration)) }} </td>
                                     <td class="fw-semibold"> {{$sponsorship->status}} </td>
                                     @if ($sponsorship->status === 'لم يتم التسليم')
                                         <td class="d-flex flex-wrap gap-1">
@@ -227,7 +359,7 @@
                                 </tr>
 
                             @empty
-                                <td colspan="7" class="fs-4 text-white" style="background-color: var(--primary-color)"> لا يوجد كفالات لعرضها </td>
+                                <td colspan="8" class="fs-4 text-white text-center" style="background-color: var(--primary-color)"> لا يوجد كفالات لعرضها </td>
                             @endforelse
 
 
@@ -254,6 +386,16 @@
                         <div class="modal-footer border-0 justify-content-center mb-2">
                             <form class="w-50" action="{{route('orphans.sponsorship.delivery')}}" method="post" enctype="multipart/form-data">
                                 @csrf
+                                <div class="col-12  mb-4">
+                                    <label class="mb-2 fw-bold">  إيصال الدفع
+                                        <span class="text-danger">*</span>
+                                    </label> <br>
+                                    <label for="payment_receipt" class="custom-file-upload text-center w-100" style="color:#777a78;">
+                                        <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
+                                        اسحب الملف هنا أو اضغط لاختياره
+                                    </label>
+                                    <x-form.input name="payment_receipt" class="hidden-file-style" type="file" id="payment_receipt" style="display: none;"/>
+                                </div>
                                 <input type="hidden" name="sponsorship_ids" id="singleOrphanId">
                                 <button type="submit" class="submit-btn w-100 rounded"> تأكيد التسليم </button>
                             </form>

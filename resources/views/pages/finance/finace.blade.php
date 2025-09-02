@@ -17,6 +17,10 @@
                 border-top-right-radius: 10px;
                 border-top-left-radius: 10px;
             }
+
+            .button:active{
+                color: white !important
+            }
         </style>
 
     @endpush
@@ -251,12 +255,23 @@
                                             <div class="modal-body border-bottom-0">
                                                 <form class="mb-3" action="{{route('orphans.finance.delivery')}}" method="post" enctype="multipart/form-data">
                                                     @csrf
+                                                    <div class="col-12  mb-4">
+                                                        <label class="mb-2 fw-bold">  إيصال الدفع
+                                                            <span class="text-danger">*</span>
+                                                        </label> <br>
+                                                        <label for="payment_receipt" class="custom-file-upload text-center w-100" style="color:#777a78;">
+                                                            <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
+                                                            اسحب الملف هنا أو اضغط لاختياره
+                                                        </label>
+                                                        <x-form.input name="payment_receipt" class="hidden-file-style" type="file" id="payment_receipt" style="display: none;"/>
+                                                    </div>
                                                     <input type="hidden" name="sponsorship_ids" id="selected-sponsorship-ids">
                                                     <button type="submit" class="submit-btn mt-3 w-100">تأكيد التسليم</button>
                                                 </form>
                                                 <button type="button" class="btn w-100 text-white" style="background-color: rgba(246, 92, 92, 1)" data-bs-dismiss="modal">إلغاء</button>
 
                                             </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -267,9 +282,21 @@
                                         <span>تصدير كشف الحساب </span>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">تحميل ملف PDF</a></li>
-                                        <li><a class="dropdown-item" href="#">تحميل ملف Excel</a></li>
-                                        <li><a class="dropdown-item" href="#">تحميل ملف Access</a></li>
+                                        <li>
+                                            <form class="dropdown-item" action="{{route('statement.download.pdf')}}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <input type="hidden" name="sponsorship_pdf_ids" id="selected-pdf-ids">
+                                                <button type="submit" class="btn button p-0" style="color: var(--primary-color)"> تحميل ملف PDF </button>
+                                            </form>
+                                        </li>
+
+                                        <li>
+                                            <form class="dropdown-item" action="{{route('statement.download.excel')}}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <input type="hidden" name="sponsorship_excel_ids" id="selected-excel-ids">
+                                                <button type="submit" class="btn button p-0" style="color: var(--primary-color)"> تحميل ملف Excel </button>
+                                            </form>
+                                        </li>
                                     </ul>
                                 </div>
 
@@ -286,7 +313,6 @@
                                         <th scope="col"> من  </th>
                                         <th scope="col"> إلى  </th>
                                         <th scope="col">  المبلغ الشهري</th>
-                                        <th scope="col">المبلغ الإجمالي </th>
                                         <th scope="col"> الحالة </th>
                                     </tr>
                                 </thead>
@@ -297,23 +323,29 @@
 
 
                                         <tr class="p-1">
-                                            @if ($sponsorship->status === 'لم يتم التسليم')
+                                            {{-- @if ($sponsorship->status === 'لم يتم التسليم') --}}
 
                                                 <td> <input type="checkbox" name="select_ids[]" class="orphan-checkbox" value="{{$sponsorship->id}}" /> </td>
-                                            @else
+                                            {{-- @else
                                                 <td> - </td>
-                                            @endif
+                                            @endif --}}
 
                                             @php
-                                                $startDate = \Carbon\Carbon::now(); // تاريخ اليوم
+                                                if($sponsorship->start_date){
+                                                    $startDate = \Carbon\Carbon::parse($sponsorship->start_date);
+                                                }else {
+                                                    $startDate = \Carbon\Carbon::now();
+                                                }
                                                 $endDate = $startDate->copy()->addMonths($sponsorship->duration); // تاريخ النهاية حسب المدة
                                             @endphp
 
                                             <td> {{ $sponsorship->duration }} </td>
-                                            <td> {{$sponsorship->amount}} </td>
-                                            <td> {{ number_format(floatval($sponsorship->amount) * intval($sponsorship->duration)) }} </td>
-                                            <td>{{ $startDate->format('Y-m-d') }}</td>
+                                            <td>
+                                                @if ($sponsorship->start_date) {{$sponsorship->start_date}} @else {{ $startDate->format('Y-m-d') }} @endif
+                                            </td>
                                             <td>{{ $endDate->format('Y-m-d') }}</td>
+                                            <td> {{$sponsorship->amount}} </td>
+
                                             @if ($sponsorship->status === 'لم يتم التسليم')
                                                 <td class="rounded d-flex justify-content-center w-75" style="color: rgba(239, 163, 0, 1);background-color:rgba(255, 219, 126, 0.17)"> لم يتم التسليم </td>
                                             @else
@@ -358,7 +390,14 @@
         document.addEventListener('DOMContentLoaded', function () {
             const checkboxes = document.querySelectorAll('.orphan-checkbox');
             const selectedWaitingIdsInput = document.getElementById('selected-sponsorship-ids');
+            const selectedExcelIdsInput = document.getElementById('selected-excel-ids');
+            const selectedPdfIdsInput = document.getElementById('selected-pdf-ids');
+
             const openModalBtn = document.getElementById('openModalBtn');
+
+            // أزرار التصدير
+            const pdfForm = document.querySelector('form[action="{{route('statement.download.pdf')}}"]');
+            const excelForm = document.querySelector('form[action="{{route('statement.download.excel')}}"]');
 
             let selectedIds = [];
 
@@ -370,6 +409,8 @@
                     }
                 });
                 selectedWaitingIdsInput.value = selectedIds.join(',');
+                selectedExcelIdsInput.value = selectedIds.join(',');
+                selectedPdfIdsInput.value = selectedIds.join(',');
             }
 
             initializeSelectedIds();
@@ -387,6 +428,8 @@
                     }
 
                     selectedWaitingIdsInput.value = selectedIds.join(',');
+                    selectedExcelIdsInput.value = selectedIds.join(',');
+                    selectedPdfIdsInput.value = selectedIds.join(',');
                 });
             });
 
@@ -397,11 +440,27 @@
                     return;
                 }
 
-                // فتح المودال يدويًا
                 const modal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
                 modal.show();
             });
+
+            // منع تنزيل PDF إذا ما في عناصر
+            pdfForm.addEventListener('submit', function (e) {
+                if (selectedIds.length === 0) {
+                    e.preventDefault();
+                    alert("يرجى تحديد كفالة واحدة على الأقل قبل تحميل ملف PDF.");
+                }
+            });
+
+            // منع تنزيل Excel إذا ما في عناصر
+            excelForm.addEventListener('submit', function (e) {
+                if (selectedIds.length === 0) {
+                    e.preventDefault();
+                    alert("يرجى تحديد كفالة واحدة على الأقل قبل تحميل ملف Excel.");
+                }
+            });
         });
+
     </script>
 @endpush
 

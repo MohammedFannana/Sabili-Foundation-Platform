@@ -20,6 +20,9 @@ class OrphansExcelImport implements ToModel, WithHeadingRow
     *
     * @return \Illuminate\Database\Eloquent\Model|null
     */
+
+    public $errors = [];
+
     public function model(array $row)
     {
         ini_set('max_execution_time', 300);
@@ -41,45 +44,21 @@ class OrphansExcelImport implements ToModel, WithHeadingRow
 
             $birthDate = null;
 
-            function parseExcelDate(?string $dateString): ?Carbon
-            {
-                if (empty($dateString)) {
-                    return null;
-                }
 
-                // إذا كان رقم (تاريخ Excel)
-                if (is_numeric($dateString)) {
-                    try {
-                        return Carbon::instance(Date::excelToDateTimeObject($dateString));
-                    } catch (\Exception $e) {
-                        return null;
-                    }
-                }
 
-                $dateString = trim($dateString);
+            $birthDate = $this->parseExcelDate($row['tarykh_almylad'] ?? null);
+            $death_deceased_date = $this->parseExcelDate($row['tarykh_alastshhad_alofa'] ?? null);
+            $mother_birth_date = $this->parseExcelDate($row['tarykh_mylad_zog_alshhyd_almtof'] ?? null);
 
-                // جرب فورمات 'd/m/Y'
-                try {
-                    return Carbon::createFromFormat('d/m/Y', $dateString);
-                } catch (\Exception $e) {}
+            $idNumber = $row['rkm_hoy_alytym'];
 
-                // جرب فورمات 'Y-m-d'
-                try {
-                    return Carbon::createFromFormat('Y-m-d', $dateString);
-                } catch (\Exception $e) {}
-
-                // جرب parse عام
-                try {
-                    return Carbon::parse($dateString);
-                } catch (\Exception $e) {}
-
-                return null;
+            $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $randomLetters = '';
+            for ($i = 0; $i < 3; $i++) {
+                $randomLetters .= $letters[rand(0, strlen($letters) - 1)];
             }
 
-            $birthDate = parseExcelDate($row['tarykh_almylad'] ?? null);
-            $death_deceased_date = parseExcelDate($row['tarykh_alastshhad_alofa'] ?? null);
-            $mother_birth_date = parseExcelDate($row['tarykh_mylad_zog_alshhyd_almtof'] ?? null);
-
+            $orphanCode = $idNumber . $randomLetters;
 
 
             Orphan::create([
@@ -87,7 +66,7 @@ class OrphansExcelImport implements ToModel, WithHeadingRow
                 'name' => $row['asm_alytym_rbaaay'],
                 'id_number' => $row['rkm_hoy_alytym'],
                 'birth_date' =>$birthDate ? $birthDate->format('Y-m-d') : null,
-                'orphan_code' => $row['rkm_kod_alytym'],
+                'orphan_code' => $orphanCode,
                 'address' => $row['mkan_alskn'],
                 'gender' => $row['algns'],
                 'health_status' => $row['alhal_alshy'],
@@ -125,7 +104,44 @@ class OrphansExcelImport implements ToModel, WithHeadingRow
 
         } catch (Exception $e) {
             DB::rollBack();
-            throw $e;
+            $this->errors[] = "خطأ في الصف رقم {$row['rkm_hoy_alytym']}: " . $e->getMessage();
+
         }
     }
+
+    private function parseExcelDate(?string $dateString): ?Carbon
+    {
+        if (empty($dateString)) {
+            return null;
+        }
+
+        // إذا كان رقم (تاريخ Excel)
+        if (is_numeric($dateString)) {
+            try {
+                return Carbon::instance(Date::excelToDateTimeObject($dateString));
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+
+        $dateString = trim($dateString);
+
+        // جرب فورمات 'd/m/Y'
+        try {
+            return Carbon::createFromFormat('d/m/Y', $dateString);
+        } catch (\Exception $e) {}
+
+        // جرب فورمات 'Y-m-d'
+        try {
+            return Carbon::createFromFormat('Y-m-d', $dateString);
+        } catch (\Exception $e) {}
+
+        // جرب parse عام
+        try {
+            return Carbon::parse($dateString);
+        } catch (\Exception $e) {}
+
+        return null;
+    }
+
 }

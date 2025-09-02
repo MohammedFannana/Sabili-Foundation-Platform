@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('start_date')->nullable();
             $table->enum('role',['active' , 'Inactive']);
             $table->enum('status' , ['تم التسليم','لم يتم التسليم']);
+            $table->string('payment_receipt');
             $table->timestamps();
         });
     }

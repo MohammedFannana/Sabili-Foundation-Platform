@@ -66,12 +66,21 @@
         {{-- الدولة  and عنوان الجهة المشرفة--}}
         @foreach ($orphans as $orphan)
 
+            <div style="width:100%">
             <!-- الشعار على اليمين -->
-            <div style="float: right;margin-right:170px;width: 100%;overflow: hidden; margin-bottom: 10px;">
-                <img src="{{ public_path('assets/images/logo1.png') }}" alt="Logo" style="width:300px; height: 150px; margin-right: 10px;">
+                <div style="float: right;margin-right:170px;width: 100%;overflow: hidden; margin-bottom: 10px;">
+                    <img src="{{ public_path('assets/images/logo1.png') }}" alt="Logo" style="width:300px; height: 150px; margin-right: 10px;">
+                    <div class="font" style="padding:0px;margin:0px 110px;color:#048d92;">
+                        <div style="display: inline-block;padding-right:22px">  {{ now()->locale('ar')->translatedFormat('l') }} </div>
+                        {{ now()->locale('ar')->translatedFormat('Y-m-d') }}
+                     </div>
+                </div>
+
+
+
             </div>
 
-            
+
 
             @foreach($fields as $key => $label)
 

@@ -1,5 +1,47 @@
 <x-main-layout title="مؤسسة سبيلي الخيرية">
 
+    @push('styles')
+
+        <style>
+            table , td , th ,tr{
+                border: none !important;
+                border-bottom: none !important;
+            }
+
+            .table-info{
+                --bs-table-bg: var(--third-color);
+                border-top-right-radius: 10px;
+                border-top-left-radius: 10px;
+            }
+
+            .intro2 {
+                display: none;
+            }
+
+            .intro2.show {
+                display: flex;
+            }
+
+            .sponorship-btn{
+                color: var(--primary-color);
+                border:1px solid var(--primary-color);
+                border-radius: 5px;
+            }
+
+            .sponorship-btn:hover{
+                background-color: var(--primary-color);
+                border:1px solid var(--primary-color);
+                color:white;
+                border-radius: 5px;
+            }
+
+
+
+        </style>
+
+    @endpush
+
+
     <section class="mt-1">
 
         <x-alert name="success" />
@@ -9,70 +51,78 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
             <h4 class="mb-1">إنشاء إستعلام</h4>
         </div>
+        {{-- end section header --}}
 
-        <div>
-            <form action="" method="get">
+        {{-- form for creating query --}}
 
+
+        <div class="mb-4">
+
+            <form action="" method="post">
+                @csrf
+
+                {{-- Hidden input to store the page from which the query is created --}}
+                <input type="hidden" name="from" value="{{$from}}">
                 {{-- <div> --}}
-                    <div id="conditions-container">
+                <div id="conditions-container">
 
-                        <div class="d-flex align-items-center align-items-center flex-wrap gap-3 mb-2 condition-row">
+                    <div class="d-flex align-items-center align-items-center flex-wrap gap-3 mb-2 condition-row">
 
-                            <div>
-                                <x-form.select label="ابحث حسب" name="search_by[]"
-                                    :options="[
-                                        'name' => __('اسم اليتيم'),
-                                        'id_number' => __('رقم هوية اليتيم'),
-                                        'birth_date' => __('تاريخ ميلاد اليتيم'),
-                                        'orphan_code' => __('كود اليتيم'),
-                                        'address' => __('العنوان'),
-                                        'gender' => __('جنس اليتيم'),
-                                        'health_status' => __('الحالة الصحية لليتيم'),
-                                        'deceased_name' => __('اسم (الشهيد/ المتوفى) رباعي'),
-                                        'deceased_id_number' => __('رقم هوية (الشهيد/ المتوفى)'),
-                                        'death_deceased_date' => __('تاريخ (الإستشهاد/ الوفاة) '),
-                                        'cause_deceased_death' => __(' سبب الوفاة '),
-                                        'father_work' => __('عمل الأب'),
-                                        'nature_father_work' => __('طبيعة عمل الأب'),
-                                        'nature_work' => __('طبيعة العمل'),
-                                        'mother_name' => __('اسم زوجة (الشهيد/ المتوفى)'),
-                                        'mother_id_number' => __('رقم هوية زوجة (الشهيد/ المتوفى)'),
-                                        'mother_birth_date' => __('تاريخ ميلاد الأم '),
-                                        'mother_status' => __('حالة الأم'),
-                                        'mother_work' => __('عمل الأم'),
-                                        'nature_mother_work' => __('طبيعة عمل الأم'),
-                                        'guardian_name' => __('اسم الوكيل'),
-                                        'guardian_id_number' => __('رقم هوية الوكيل'),
-                                        'guardian_relation' => __('صلة القرابة الوكيل'),
-                                        // 'orphan_sibling' => __('أخوة اليتيم'),
-                                        'phone' => __('رقم جوال أساسي'),
-                                        'phone1' => __('رقم جوال ثانوي'),
-                                        'email' => __('البريد الالكتروني'),
-                                    ]"
-                                    value="name"
-                                    class="search-by"
-                                />
-                            </div>
-
-                            <div>
-                                <x-form.select label="الشرط" name="condition[]"
-                                    :options="['==' => __('مطابق ل')]"
-                                />
-                            </div>
-
-                            <div style="width: 45%">
-                                <label class="mb-2 fw-bold">القيمة</label>
-                                <div class="search-input-wrapper">
-                                    <select name="search_value[]" class="form-select search-options"></select>
-                                </div>
-                            </div>
-
-                            <button type="button" id="add-condition" class="btn" style="border: 1px solid var(--primary-color); color: var(--primary-color);margin-top:1.9rem">
-                                + شرط جديد
-                            </button>
-
+                        <div>
+                            <x-form.select label="ابحث حسب" name="search_by[]"
+                                :options="[
+                                    'name' => __('اسم اليتيم'),
+                                    'id_number' => __('رقم هوية اليتيم'),
+                                    'birth_date' => __('تاريخ ميلاد اليتيم'),
+                                    'orphan_code' => __('كود اليتيم'),
+                                    'address' => __('العنوان'),
+                                    'gender' => __('جنس اليتيم'),
+                                    'health_status' => __('الحالة الصحية لليتيم'),
+                                    'deceased_name' => __('اسم (الشهيد/ المتوفى) رباعي'),
+                                    'deceased_id_number' => __('رقم هوية (الشهيد/ المتوفى)'),
+                                    'death_deceased_date' => __('تاريخ (الإستشهاد/ الوفاة) '),
+                                    'cause_deceased_death' => __(' سبب الوفاة '),
+                                    'father_work' => __('عمل الأب'),
+                                    'nature_father_work' => __('طبيعة عمل الأب'),
+                                    'nature_work' => __('طبيعة العمل'),
+                                    'mother_name' => __('اسم زوجة (الشهيد/ المتوفى)'),
+                                    'mother_id_number' => __('رقم هوية زوجة (الشهيد/ المتوفى)'),
+                                    'mother_birth_date' => __('تاريخ ميلاد الأم '),
+                                    'mother_status' => __('حالة الأم'),
+                                    'mother_work' => __('عمل الأم'),
+                                    'nature_mother_work' => __('طبيعة عمل الأم'),
+                                    'guardian_name' => __('اسم الوكيل'),
+                                    'guardian_id_number' => __('رقم هوية الوكيل'),
+                                    'guardian_relation' => __('صلة القرابة الوكيل'),
+                                    // 'orphan_sibling' => __('أخوة اليتيم'),
+                                    'phone' => __('رقم جوال أساسي'),
+                                    'phone1' => __('رقم جوال ثانوي'),
+                                    'email' => __('البريد الالكتروني'),
+                                ]"
+                                value="name"
+                                class="search-by"
+                            />
                         </div>
+
+                        <div>
+                            <x-form.select label="الشرط" name="condition[]"
+                                :options="['==' => __('مطابق ل')]"
+                            />
+                        </div>
+
+                        <div style="width: 45%">
+                            <label class="mb-2 fw-bold">القيمة</label>
+                            <div class="search-input-wrapper">
+                                <select name="search_value[]" class="form-select search-options"></select>
+                            </div>
+                        </div>
+
+                        <button type="button" id="add-condition" class="btn" style="border: 1px solid var(--primary-color); color: var(--primary-color);margin-top:1.9rem">
+                            + شرط جديد
+                        </button>
+
                     </div>
+                </div>
 
 
                 <div>
@@ -82,6 +132,52 @@
             </form>
 
         </div>
+
+        @if ($orphans)
+
+            <div>
+
+                @if ($from == 'auditing_addition_page')
+                    <div>
+                        <h3 class="mb-1"> تدقيق طلبات الإضافة </h3>
+                        <p style="color: rgba(36, 36, 36, 0.6);font-size:16px">
+                            راجع بيانات الأيتام المضافة حديثًا، ثم قم باعتمادهم أو إحالتهم للانتظار أو حذفهم.
+                        </p>
+                    </div>
+                    @includeIf('pages.orphans.partials.auditing_addition_partial', ['orphans' => $orphans])
+
+                @elseif ($from == 'sponsorship_page')
+                    <div>
+                        <h3 class="mb-1"> الأيتام المكفولون </h3>
+                        <p style="color: rgba(36, 36, 36, 0.6);font-size:16px">
+                            قائمة الأيتام الذين يتلقون كفالات مالية بشكل شهري، مع تفاصيل الكفالة وسجلات التسليمات.
+                        </p>
+                    </div>
+                    @includeIf('pages.orphans.partials.sponsored_partial', ['orphans' => $orphans])
+
+                @elseif ($from == 'adopted_page')
+                    <div>
+                        <h3 class="mb-1"> الأيتام المعتمدون </h3>
+                        <p style="color: rgba(36, 36, 36, 0.6);font-size:16px">
+                            هذه القائمة تحتوي على جميع الأيتام الذين تم اعتماد بياناتهم وهم مؤهلون للكفالة.
+                        </p>
+                    </div>
+                    @includeIf('pages.orphans.partials.adopted_partial', ['orphans' => $orphans])
+
+                @elseif ($from == 'waiting_page')
+                    <div>
+                        <h3 class="mb-1"> الأيتام قيد الانتظار </h3>
+                        <p style="color: rgba(36, 36, 36, 0.6);font-size:16px">
+                            أيتام بحاجة لاستكمال البيانات أو إعادة التدقيق قبل اعتمادهم.
+                        </p>
+                    </div>
+                    @includeIf('pages.orphans.partials.waiting_partial', ['orphans' => $orphans])
+
+                @endif
+
+            </div>
+
+        @endif
 
     </section>
 
@@ -259,5 +355,9 @@
         </script>
     @endpush
 
+    @if ($orphans)
 
+        {{$orphans->withQueryString()->links()}}
+
+    @endif
 </x-main-layout>

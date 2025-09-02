@@ -36,7 +36,7 @@
 
                 </div>
 
-                <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                {{-- <div class="col-12 col-sm-6 col-lg-3 mb-4">
                     <form action="{{ route('orphan.uplode.access') }}"  id="access-form"  method="post" enctype="multipart/form-data">
                         @csrf
                         <label for="orphan_access_file" class="custom-file-upload text-center p-2 ps-3 pe-3 w-100"
@@ -48,9 +48,10 @@
                                     class="hidden-file-style"
                                     type="file"
                                     id="orphan_access_file"
-                                    style="display: none;" />
+                                    style="display: none;" accept=".accdb,.mdb"/>
                     </form>
-                </div>
+                </div> --}}
+
             </div>
 
             <div id="uploading-message" style="display:none; text-align:center; padding:2px; color:white; background: var(--primary-color); border-radius: 5px;">
@@ -70,9 +71,9 @@
 
                 const uploadingMessage = document.getElementById('uploading-message');
                 const excelInput = document.getElementById('orphan_excel_file');
-                const accessInput = document.getElementById('orphan_access_file');
+                // const accessInput = document.getElementById('orphan_access_file');
                 const excelForm = document.getElementById('excel-form');
-                const accessForm = document.getElementById('access-form');
+                //const accessForm = document.getElementById('access-form');
 
                 function handleFileUpload(inputElement, formElement) {
                     if (uploading) {
@@ -96,9 +97,9 @@
                     handleFileUpload(excelInput, excelForm);
                 });
 
-                accessInput.addEventListener('change', function () {
-                    handleFileUpload(accessInput, accessForm);
-                });
+                // accessInput.addEventListener('change', function () {
+                //     handleFileUpload(accessInput, accessForm);
+                // });
             });
 
         </script>

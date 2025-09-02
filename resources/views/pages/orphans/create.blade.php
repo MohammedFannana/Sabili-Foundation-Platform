@@ -43,7 +43,7 @@
                                         </div>
 
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                            <x-form.input name="id_number"  type="text" id="id_number" label=" رقم هوية اليتيم " required="required" placeholder=" ادخل رقم الهوية " />
+                                            <x-form.input name="id_number"  class="starts-with-4" type="text" id="id_number" label=" رقم هوية اليتيم " required="required" placeholder=" ادخل رقم الهوية " />
                                         </div>
 
                                         {{-- birth-date --}}
@@ -151,7 +151,7 @@
 
                                         {{-- deceased_id_number --}}
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                            <x-form.input name="deceased_id_number"  type="text" id="deceased_id_number" label=" رقم هوية (الشهيد/ المتوفى)  " required="required" placeholder=" ادخل رقم الهوية " />
+                                            <x-form.input name="deceased_id_number"  class="starts-with-4"  type="text" id="deceased_id_number" label=" رقم هوية (الشهيد/ المتوفى)  " required="required" placeholder=" ادخل رقم الهوية " />
                                         </div>
 
                                         {{-- death_deceased_date --}}
@@ -274,7 +274,7 @@
 
                                         {{-- mother_id_number --}}
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                            <x-form.input name="mother_id_number"  type="text" id="mother_id_number" label=" رقم هوية زوجة (الشهيد/ المتوفى) " placeholder=" ادخل رقم الهوية " />
+                                            <x-form.input name="mother_id_number"  class="starts-with-4"  type="text" id="mother_id_number" label=" رقم هوية زوجة (الشهيد/ المتوفى) " placeholder=" ادخل رقم الهوية " />
                                         </div>
 
                                         {{-- mother_birth_date --}}
@@ -374,7 +374,7 @@
 
                                         {{-- guardian_id_number --}}
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                            <x-form.input name="guardian_id_number" required="required" type="text" id="guardian_id_number" label=" رقم هوية الوكيل " placeholder=" ادخل رقم الهوية " />
+                                            <x-form.input name="guardian_id_number"  class="starts-with-4" required="required" type="text" id="guardian_id_number" label=" رقم هوية الوكيل " placeholder=" ادخل رقم الهوية " />
                                         </div>
 
                                         {{-- guardian_relation --}}
@@ -431,12 +431,12 @@
                                                     </td>
 
                                                      <td>
-                                                        <input name="brother_id_number[]" type="text" placeholder=" رقم الهوية " class="rounded form-control" />
+                                                        <input name="brother_id_number[]"  class="starts-with-4" type="text" placeholder=" رقم الهوية " class="rounded form-control" />
                                                     </td>
 
                                                     <td>
                                                         <select name="brother_gender[]"  class="form-control rounded form-select">
-                                                            <option selected> أدخل الجنس </option>
+                                                            <option value="" selected> أدخل الجنس </option>
                                                             <option value="ذكر">ذكر</option>
                                                             <option value="أنثى">أنثى</option>
                                                         </select>
@@ -447,12 +447,13 @@
                                                     </td>
 
                                                     <td>
+                                                        
                                                         <select name="brother_health_status[]" class="form-control rounded form-select">
-                                                            <option selected value="اختر">اختر</option>
+                                                            <option value="" selected>اختر</option>
                                                             <option value="سليم">سليم</option>
                                                             <option value="مريض">مريض</option>
-
                                                         </select>
+
                                                     </td>
 
                                                     <td>
@@ -550,7 +551,7 @@
                                                 </div>
 
                                                  <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                                    <x-form.input name="bank_owner_id_number" type="text" id="bank_owner_id_number" required="required" label=" رقم هوية صاحب الحساب " placeholder="ادخل رقم هوية صاحب الحساب" />
+                                                    <x-form.input name="bank_owner_id_number" class="starts-with-4" type="text" id="bank_owner_id_number" required="required" label=" رقم هوية صاحب الحساب " placeholder="ادخل رقم هوية صاحب الحساب" />
                                                 </div>
 
                                                 <div class="col-12 col-md-6 col-lg-4 mb-4">
@@ -575,7 +576,7 @@
                                                 </div>
 
                                                 <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                                    <x-form.input name="wallet_owner_id_number" class="" type="text" id="wallet_owner_id_number" label=" رقم هوية صاحب المحفظة " placeholder="ادخل رقم هوية صاحب المحفظة" />
+                                                    <x-form.input name="wallet_owner_id_number"  class="starts-with-4" type="text" id="wallet_owner_id_number" label=" رقم هوية صاحب المحفظة " placeholder="ادخل رقم هوية صاحب المحفظة" />
                                                 </div>
 
                                                 <div class="col-12 col-md-6 col-lg-4 mb-4">
@@ -622,7 +623,7 @@
 
                                         {{-- wife_ID --}}
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                                <label class="mb-2 fw-bold">  أرفق صورة هوية الزوجة كاملة مع أساليب
+                                                <label class="mb-2 fw-bold">  أرفق صورة هوية الزوجة كاملة مع السليب
                                                     <span class="text-danger">*</span>
                                                 </label> <br>
                                                 <label for="wife_ID" class="custom-file-upload text-center" style="color:#777a78;">
@@ -708,10 +709,11 @@
                         <input name="brother_name[]" type="text" placeholder="اسم الأخ/الأخت" class="form-control" />
                     </td>
                     <td>
-                        <input name="brother_id_number[]" type="text" placeholder="رقم الهوية" class="form-control" />
+                        <input name="brother_id_number[]" type="text" placeholder="رقم الهوية" class="form-control starts-with-X" />
                     </td>
                     <td>
                         <select name="brother_gender[]" class="form-control">
+                            <option value="" selected> أدخل الجنس </option>
                             <option value="ذكر">ذكر</option>
                             <option value="أنثى">أنثى</option>
                         </select>
@@ -720,10 +722,12 @@
                         <input name="brother_birth_date[]" type="date" class="form-control" />
                     </td>
                     <td>
-                        <select name="brother_health_status[]" class="form-control">
+                        <select name="brother_health_status[]" class="form-control rounded form-select">
+                            <option value="" selected>اختر</option>
                             <option value="سليم">سليم</option>
                             <option value="مريض">مريض</option>
                         </select>
+
                     </td>
                     <td>
                         <label for="${uniqueId}" class="btn btn-sm btn-outline-secondary">
@@ -777,6 +781,54 @@
                 });
             });
         </script>
+
+
+        <script>
+            document.getElementById('id_number').addEventListener('input', function() {
+                let idNumber = this.value.trim();
+                if (idNumber.length > 0) {
+                    // توليد 3 حروف عشوائية
+                    let randomLetters = '';
+                    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    for (let i = 0; i < 3; i++) {
+                        randomLetters += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+
+                    // دمج رقم الهوية مع الحروف العشوائية
+                    let orphanCode = idNumber + randomLetters;
+
+                    // وضع القيمة في حقل الكود وتعطيله
+                    let codeInput = document.getElementById('orphan_code');
+                    codeInput.value = orphanCode;
+                    codeInput.setAttribute('readonly', 'readonly');
+                } else {
+                    document.getElementById('orphan_code').value = '';
+                    document.getElementById('orphan_code').removeAttribute('readonly');
+                }
+            });
+        </script>
+
+        <script>
+            document.querySelectorAll('.starts-with-4').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    // إزالة أي أحرف غير الأرقام
+                    this.value = this.value.replace(/\D/g, '');
+            
+                    // الحد الأقصى 9 أرقام
+                    if (this.value.length > 9) {
+                        this.value = this.value.slice(0, 9);
+                    }
+            
+                    // تحقق أن أول رقم >= 4
+                    if (this.value.length > 0 && parseInt(this.value[0]) < 4) {
+                        alert("الرقم يجب أن يبدأ بـ 4 أو أكبر");
+                        this.value = ''; // نفرغ الحقل
+                    }
+                });
+            });
+        </script>
+
+
 
 
     @endpush

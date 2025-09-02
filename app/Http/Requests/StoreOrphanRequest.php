@@ -27,7 +27,7 @@ class StoreOrphanRequest extends FormRequest
 
             // البيانات الاساسية
             'name' => ['required' , 'string'],
-            'id_number' => ['required' , 'unique:orphans,id_number','digits:9'],
+            'id_number' => ['required' , 'unique:orphans,id_number','digits:9', 'regex:/^[4-9]\d{8}$/'],
             'birth_date' => ['required' , 'date'],
             'orphan_code' => ['required' , 'unique:orphans,orphan_code'],
             'address' => ['required' , 'string'],
@@ -37,7 +37,7 @@ class StoreOrphanRequest extends FormRequest
 
             // // بيانات الأب
             'deceased_name' => ['required' , 'string'],
-            'deceased_id_number' => ['required' , 'digits:9'],
+            'deceased_id_number' => ['required' , 'digits:9', 'regex:/^[4-9]\d{8}$/'],
             'death_deceased_date' => ['required' , 'date'],
             'cause_deceased_death' => ['nullable' , 'in:شهيد,وفاة طبيعية'],
             'father_work' => ['nullable' , 'in:يعمل,لا يعمل'],
@@ -46,55 +46,58 @@ class StoreOrphanRequest extends FormRequest
 
             // // بيانات الأم
             'mother_name' => ['required','string'],
-            'mother_id_number' => ['required' , 'digits:9'],
+            'mother_id_number' => ['required' , 'digits:9', 'regex:/^[4-9]\d{8}$/'],
             'mother_birth_date' => ['nullable' , 'date'],
             'mother_status' => ['required' , 'in:على قيد الحياة- أرملة,على قيد الحياة- متزوجة زوج آخر,على قيد الحياة- مطلقة,شهيدة/ متوفية'],
             'mother_work' => ['nullable' , 'in:تعمل,لا تعمل'],
             'nature_mother_work' => ['nullable' , 'in:موظف حكومي,موظف وكالة,عمل خاص'],
 
 
-            // // بيانات الوكيل
+            // // // بيانات الوكيل
             'guardian_name' => ['required' , 'string'],
-            'guardian_id_number' => ['required' , 'digits:9'],
+            'guardian_id_number' => ['required' , 'digits:9', 'regex:/^[4-9]\d{8}$/'],
             'guardian_relation' => ['required' , 'in:أم,أخ/ت,جد/ة,عم/ة,خال/ة,غير ذلك'],
             'guardian_anthor_relation' => ['nullable' , 'string' , 'required_if:guardian_relation,غير ذلك'],
 
-            // //بيانات التواصل
+            // // //بيانات التواصل
             'phone' => ['required' , 'string'],
             'phone1' => ['required' , 'string'],
             'email' => ['nullable' , 'email'],
 
             // // بيانات استلام الكفالة
-            'bank_name' => ['required' , 'string'],
-            'bank_account_owner' => ['required' , 'string'],
-            'bank_owner_id_number' => ['required' , 'digits:9'],
-            'phone_number_linked_bank' => ['required' , 'string'],
-            'bank_account_number' => ['required' ,'digits_between:4,24'],
-            'wallet_owner' => ['nullable' , 'string'],
-            'wallet_owner_id_number' => ['nullable' , 'digits:9'],
-            'owner_phone_linked_wallet' => ['nullable' , 'string'],
+            // // بيانات البنك
+            'bank_name' => ['nullable', 'string', 'required_without:wallet_owner'],
+            'bank_account_owner' => ['nullable','required_with:bank_name', 'string'],
+            'bank_owner_id_number' => ['nullable','required_with:bank_name', 'digits:9', 'regex:/^[4-9]\d{8}$/'],
+            'phone_number_linked_bank' => ['nullable', 'required_with:bank_name', 'string'],
+            'bank_account_number' => ['nullable','required_with:bank_name', 'digits_between:4,24'],
+        
+            // // // بيانات المحفظة
+            'wallet_owner' => ['nullable', 'string', 'required_without:bank_name'],
+            'wallet_owner_id_number' => ['nullable' , 'required_with:wallet_owner', 'digits:9', 'regex:/^[4-9]\d{8}$/'],
+            'owner_phone_linked_wallet' => ['nullable' , 'required_with:wallet_owner', 'string'],
 
-            // // brother table
+            // // // // brother table
             'brother_name' => ['nullable', 'array'],
             'brother_name.*' => ['string', 'nullable'],
 
             'brother_id_number' => ['nullable', 'array'],
-            'brother_id_number.*' => ['numeric', 'nullable', Rule::unique('brothers', 'brother_id_number'),'digits:9'],
+            'brother_id_number.*' => ['nullable', 'digits:9' , 'regex:/^[4-9]\d{8}$/'],
 
             'brother_gender' => ['nullable', 'array'],
-            'brother_gender.*' => ['string', 'nullable', 'in:ذكر,أنثى'],
+            'brother_gender.*' => ['nullable', 'in:ذكر,أنثى'],
 
             'brother_birth_date' => ['nullable', 'array'],
             'brother_birth_date.*' => ['date', 'nullable'],
 
             'brother_health_status' => ['nullable', 'array'],
-            'brother_health_status.*' => ['nullable'  , 'in:مريض,سليم'],
+            'brother_health_status.*' => ['nullable' , 'in:مريض,سليم'],
 
             'brother_medical_report' => ['nullable', 'array'],
             // // 'required_if:brother_health_status,مريض'
             'brother_medical_report.*' => ['image', 'nullable'  , 'dimensions:min_width=100,min_height=100','max:1048576'],
 
-            // // images table
+            // // // images table
             'father_death_certificate' => ['required' , 'image' , 'dimensions:min_width=100,min_height=100','max:1048576'],
             'wife_ID' => ['required' , 'image' , 'dimensions:min_width=100,min_height=100','max:1048576'],
             'sponsor_ID' => ['required' , 'image' , 'dimensions:min_width=100,min_height=100','max:1048576'],

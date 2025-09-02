@@ -8,20 +8,16 @@
 
 
         {{-- section header component --}}
-        <h3 class="mb-5"> إضافة يتيم </h3>
-
-        <div class="mb-4 rounded p-2 pt-2 pb-2 row ms-1 me-1" style="background-color:#f8fafa;">
-            <a href="{{route('orphan.create')}}" class="col-12 col-sm-6 text-center fw-semibold text-decoration-none p-2 rounded" style="color: var(--primary-color); background-color:var(--third-color)"> الإضافة يدويًا بشكل فردي </a>
-            <a href="{{route('orphan.group.create')}}" class="col-12 col-sm-6 text-center fw-semibold text-decoration-none p-2 rounded" style="color: rgba(36, 36, 36, 0.6)"> استيراد جماعي </a>
-        </div>
+        <h3 class="mb-5"> تعديل بيانات اليتيم </h3>
 
         <div class="rounded mt-3" style="border-top-color:#f0fff4 !important">
 
             <div class="mt-4 mb-4 row">
 
 
-                <form action="" method="post" enctype="multipart/form-data">
+                <form action="{{route('orphan.update' , $orphan->id)}}" method="post" enctype="multipart/form-data">
                     @csrf
+                    @method('put')
 
                     <div class="row">
 
@@ -99,13 +95,15 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <br>
-                                                <a href="{{route('orphan.show.image' , ['file' => encrypt($orphan->medical_report)])}}" type="button" class="text-decoration-none file-image p-2">
+                                                @if($orphan->image && $orphan->image->medical_report)
+                                                <a href="{{route('orphan.show.image' , ['file' => encrypt($orphan->image->medical_report)])}}" type="button" class="text-decoration-none file-image p-2">
                                                     <img src="{{asset('assets/icon/album.png')}}" alt="" width="24px" height="24px" >
                                                     التقرير الطبي
                                                 </a>
+                                                @endif
                                                 <br>
                                                 <label for="medical_report" class="custom-file-upload text-center" style="color:#777a78;">
-                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> ,<br>
+                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
                                                     اسحب الملف هنا أو اضغط لاختياره
                                                 </label>
                                                 <x-form.input name="medical_report" class="hidden-file-style" type="file" id="medical_report" style="display: none;"/>
@@ -162,16 +160,20 @@
                                         </div>
 
                                         {{-- nature_father_work --}}
+                                        @if($orphan->nature_father_work)
                                         <div class="col-12 col-md-6  mb-4">
 
                                             <x-form.radio name="nature_father_work" label=" طبيعة عمل الأب " :options="['موظف حكومي' => 'موظف حكومي' , 'موظف وكالة' => 'موظف وكالة' , 'عمل خاص' => 'عمل خاص']" :selected="$orphan->nature_father_work"/>
 
                                         </div>
+                                        @endif
 
                                         {{-- nature_work --}}
+                                        @if($orphan->nature_work)
                                         <div class="col-12 mb-4">
                                             <x-form.input name="nature_work" value="{{$orphan->nature_work}}" type="text" id="nature_work" label=" طبيعة العمل " placeholder="ادخل طبيعة العمل"/>
                                         </div>
+                                        @endif
 
 
 
@@ -225,10 +227,12 @@
                                         </div>
 
                                         {{-- nature_mother_work --}}
+                                        @if($orphan->nature_mother)
                                         <div class="col-12 col-md-6  mb-4">
-
+        
                                             <x-form.radio name="nature_mother_work" label=" طبيعة عمل الأم " :options="['موظفة حكومة' => 'موظف حكومي' , 'موظفة وكالة' => 'موظف وكالة' , 'عمل خاص' => 'عمل خاص']" :selected="$orphan->nature_mother_work"/>
                                         </div>
+                                        @endif
 
                                     </div>
 
@@ -271,9 +275,11 @@
                                         </div>
 
                                         {{-- guardian_anthor_relation --}}
+                                        @if($orphan->guardian_anthor_relation)
                                         <div class="col-12  mb-4">
                                             <x-form.input name="guardian_anthor_relation" value="{{$orphan->guardian_anthor_relation}}"  required="required"  type="text" id="guardian_anthor_relation" label=" إذا كان غير ذلك, يرجى توضيح صلة القرابة " placeholder=" ادخل صلة القرابة " />
                                         </div>
+                                        @endif
 
 
                                     </div>
@@ -358,7 +364,7 @@
 
                                                         <td>
                                                             <select name="brother_gender[]"  class="form-control rounded form-select">
-                                                                <option selected> أدخل الجنس </option>
+                                                                <option value="" selected> أدخل الجنس </option>
                                                                 <option value="ذكر">ذكر</option>
                                                                 <option value="أنثى">أنثى</option>
                                                             </select>
@@ -370,7 +376,7 @@
 
                                                         <td>
                                                             <select name="brother_health_status[]" class="form-control rounded form-select">
-                                                                <option selected value="اختر">اختر</option>
+                                                                <option selected value="" >اختر</option>
                                                                 <option value="سليم">سليم</option>
                                                                 <option value="مريض">مريض</option>
 
@@ -465,7 +471,7 @@
 
                                                 <div class="col-12 col-md-6 col-lg-4 mb-4">
                                                     {{-- :selected="$orphan->case_type" --}}
-                                                    <x-form.select id="bank_name" label=" اسم البنك  "  required="required"  name="bank_name" :selected="$orphan->bank_name"
+                                                    <x-form.select id="bank_name" label=" اسم البنك  "  name="bank_name" :selected="$orphan->bank_name"
                                                         :options="['' =>  __('اختر'), 'فلسطين' => __('فلسطين'), 'الاسلامي الفلسطيني' => __('الاسلامي الفلسطيني') ,'الاسلامي العربي' => __('الاسلامي العربي'), 'القدس' => __('القدس'), 'الاردن' => __('الاردن'), 'القاهرة عمان' => __('القاهرة عمان') ]"/>
                                                 </div>
 
@@ -533,93 +539,114 @@
                                     <div class="row mb-3">
 
                                         {{-- father_death_certificate --}}
+                                       
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
                                                 <label class="mb-2 fw-bold">  أرفق صورة شهادة وفاة الأب
                                                     <span class="text-danger">*</span>
                                                 </label>
+                                                 @if($orphan->image && $orphan->image->father_death_certificate)
                                                  <br>
                                                 <a href="{{route('orphan.show.image' , ['file' => encrypt($orphan->image->father_death_certificate)])}}" type="button" class="text-decoration-none file-image p-2">
                                                     <img src="{{asset('assets/icon/album.png')}}" alt="" width="24px" height="24px" >
                                                     شهادة وفاة الأب
                                                 </a>
+                                                @endif
                                                  <br>
-                                                <label for="father_death_certificate*" class="custom-file-upload text-center" style="color:#777a78;">
-                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> ,<br>
+                                                <label for="father_death_certificate" class="custom-file-upload text-center" style="color:#777a78;">
+                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
                                                     اسحب الملف هنا أو اضغط لاختياره
                                                 </label>
                                                 <x-form.input name="father_death_certificate" class="hidden-file-style" type="file" id="father_death_certificate" style="display: none;"/>
                                         </div>
+                                        
 
                                         {{-- wife_ID --}}
+                                        
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
-                                                <label class="mb-2 fw-bold">  أرفق صورة هوية الزوجة كاملة مع أساليب
+                                                <label class="mb-2 fw-bold">  أرفق صورة هوية الزوجة كاملة مع السليب
                                                     <span class="text-danger">*</span>
                                                 </label>
+                                                @if($orphan->image && $orphan->image->wife_ID)
                                                  <br>
                                                  <a href="{{route('orphan.show.image' , ['file' => encrypt($orphan->image->wife_ID)])}}" type="button" class="text-decoration-none file-image p-2">
                                                     <img src="{{asset('assets/icon/album.png')}}" alt="" width="24px" height="24px" >
                                                     صورة هوية الزوجة كاملة
                                                 </a>
+                                                @endif
                                                 <br>
                                                     <label for="wife_ID" class="custom-file-upload text-center" style="color:#777a78;">
-                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> ,<br>
+                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
                                                     اسحب الملف هنا أو اضغط لاختياره
                                                 </label>
                                                 <x-form.input name="wife_ID" class="hidden-file-style" type="file" id="wife_ID" style="display: none;"/>
                                         </div>
+                                       
 
                                         {{-- sponsor_ID --}}
+                                       
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
                                                 <label class="mb-2 fw-bold">  أرفق صورة هوية الكفيل
                                                     <span class="text-danger">*</span>
-                                                </label> <br>
+                                                </label> 
+                                                 @if($orphan->image && $orphan->image->sponsor_ID)<br>
                                                 <a href="{{route('orphan.show.image' , ['file' => encrypt($orphan->image->sponsor_ID)])}}" type="button" class="text-decoration-none file-image p-2">
                                                     <img src="{{asset('assets/icon/album.png')}}" alt="" width="24px" height="24px" >
                                                     صورة هوية الوكيل
                                                 </a>
+                                                @endif
                                                 <br>
                                                 <label for="sponsor_ID" class="custom-file-upload text-center" style="color:#777a78;">
-                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> ,<br>
+                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
                                                     اسحب الملف هنا أو اضغط لاختياره
                                                 </label>
                                                 <x-form.input name="sponsor_ID" class="hidden-file-style" type="file" id="sponsor_ID" style="display: none;"/>
                                         </div>
+                                      
 
 
                                         {{-- birth_certificate --}}
+                                        
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
                                                 <label class="mb-2 fw-bold">  أرفق صورة شهادة الميلاد
                                                     <span class="text-danger">*</span>
-                                                </label> <br>
+                                                </label>
+                                                @if($orphan->image && $orphan->image->birth_certificate)<br>
                                                 <a href="{{route('orphan.show.image' , ['file' => encrypt($orphan->image->birth_certificate)])}}" type="button" class="text-decoration-none file-image p-2">
                                                     <img src="{{asset('assets/icon/album.png')}}" alt="" width="24px" height="24px" >
                                                     شهادة الميلاد
                                                 </a>
+                                                @endif
                                                 <br>
                                                 <label for="birth_certificate" class="custom-file-upload text-center" style="color:#777a78;">
-                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> ,<br>
+                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
                                                     اسحب الملف هنا أو اضغط لاختياره
                                                 </label>
                                                 <x-form.input name="birth_certificate" class="hidden-file-style" type="file" id="birth_certificate" style="display: none;"/>
                                         </div>
+                                        
 
                                         {{-- personl_image --}}
+                                        
                                         <div class="col-12 col-md-6 col-lg-4 mb-4">
                                                 <label class="mb-2 fw-bold">  أرفق صورة شخصية حديثة للطفل
                                                     <span class="text-danger">*</span>
-                                                </label> <br>
+                                                </label> 
+                                                @if($orphan->image && $orphan->image->personl_image)
+                                                <br>
                                                 <a href="{{route('orphan.show.image' , ['file' => encrypt($orphan->image->personl_image)])}}" type="button" class="text-decoration-none file-image p-2">
                                                     <img src="{{asset('assets/icon/album.png')}}" alt="" width="24px" height="24px" >
                                                     صورة شخصية حديثة
                                                 </a>
+                                                @endif
                                                 <br>
 
                                                 <label for="personl_image" class="custom-file-upload text-center" style="color:#777a78;">
-                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> ,<br>
+                                                    <img src="{{asset('assets/images/file.png')}}" alt="" width="50px" height="50px"> <br>
                                                     اسحب الملف هنا أو اضغط لاختياره
                                                 </label>
                                                 <x-form.input name="personl_image" class="hidden-file-style" type="file" id="personl_image" style="display: none;"/>
                                         </div>
+                                       
 
                                     </div>
 
@@ -662,7 +689,7 @@
 
                     <td>
                         <select name="brother_gender[]"  class="form-control rounded form-select">
-                            <option selected> أدخل الجنس </option>
+                            <option value="" selected> أدخل الجنس </option>
                             <option value="ذكر">ذكر</option>
                             <option value="أنثى">أنثى</option>
                         </select>
@@ -674,7 +701,7 @@
 
                     <td>
                         <select name="brother_health_status[]" class="form-control rounded form-select">
-                            <option selected value="اختر">اختر</option>
+                            <option selected value="">اختر</option>
                             <option value="سليم">سليم</option>
                             <option value="مريض">مريض</option>
 
@@ -692,6 +719,96 @@
                     </td>
                 `;
             }
+        </script>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // إظهار التقرير الطبي إذا كان "مريض"
+                function toggleMedicalReport() {
+                    const isSick = document.querySelector('input[name="health_status"]:checked')?.value === 'مريض';
+                    document.getElementById("medical_report_health").style.display = isSick ? "block" : "none";
+                }
+
+                // إظهار طبيعة عمل الأب إذا "يعمل"
+                function toggleFatherWork() {
+                    const isWorking = document.querySelector('input[name="father_work"]:checked')?.value === 'يعمل';
+                    document.getElementById("nature_father_work").style.display = isWorking ? "block" : "none";
+                    document.getElementById("nature_work").style.display = isWorking ? "block" : "none";
+                }
+
+                // إظهار طبيعة عمل الأم إذا "تعمل"
+                function toggleMotherWork() {
+                    const isWorking = document.querySelector('input[name="mother_work"]:checked')?.value === 'تعمل';
+                    document.getElementById("nature_mother_work").style.display = isWorking ? "block" : "none";
+                }
+
+                // استدعاء أولي لتطبيق الحالة حسب القيم المحفوظة (في حال التعديل)
+                toggleMedicalReport();
+                toggleFatherWork();
+                toggleMotherWork();
+
+                // إضافة مستمعي الأحداث
+                document.querySelectorAll('input[name="health_status"]').forEach(el => {
+                    el.addEventListener('change', toggleMedicalReport);
+                });
+
+                document.querySelectorAll('input[name="father_work"]').forEach(el => {
+                    el.addEventListener('change', toggleFatherWork);
+                });
+
+                document.querySelectorAll('input[name="mother_work"]').forEach(el => {
+                    el.addEventListener('change', toggleMotherWork);
+                });
+            });
+        </script>
+
+
+        <script>
+            document.getElementById('id_number').addEventListener('input', function() {
+                let idNumber = this.value.trim();
+                if (idNumber.length > 0) {
+                    // توليد 3 حروف عشوائية
+                    let randomLetters = '';
+                    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    for (let i = 0; i < 3; i++) {
+                        randomLetters += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+
+                    // دمج رقم الهوية مع الحروف العشوائية
+                    let orphanCode = idNumber + randomLetters;
+
+                    // وضع القيمة في حقل الكود وتعطيله
+                    let codeInput = document.getElementById('orphan_code');
+                    codeInput.value = orphanCode;
+                    codeInput.setAttribute('readonly', 'readonly');
+                } else {
+                    document.getElementById('orphan_code').value = '';
+                    document.getElementById('orphan_code').removeAttribute('readonly');
+                }
+            });
+        </script>
+
+        <script>
+            document.querySelectorAll('.starts-with-4').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    // اجعل الحقل يبدأ دائمًا بالرقم 4
+                    if (!this.value.startsWith('4')) {
+                        this.value = '4' + this.value.replace(/4/g, '');
+                    }
+
+                    // الحد الأقصى 9 أرقام
+                    if (this.value.length > 9) {
+                        this.value = this.value.slice(0, 9);
+                    }
+
+                    // إزالة أي أحرف غير الأرقام
+                    this.value = this.value.replace(/\D/g, '');
+                    // إعادة الرقم 4 في البداية بعد إزالة الأحرف
+                    if (!this.value.startsWith('4')) {
+                        this.value = '4' + this.value.slice(1);
+                    }
+                });
+            });
         </script>
 
     @endpush

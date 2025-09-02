@@ -74,7 +74,7 @@
                 <p class="mb-0 pb-0 fw-semibold fs-5">آخر الإشعارات</p>
             </div>
 
-            <a href="{{route('orphan.notification')}}" class="d-flex align-items-center gap-1 text-decoration-none">
+            <a href="{{route('notification')}}" class="d-flex align-items-center gap-1 text-decoration-none">
                 <p class="mb-0 pb-0" style="color: var(--primary-color)">عرض الكل</p>
                 <img src="{{asset('assets/icon/arrow.png')}}" alt="">
             </a>

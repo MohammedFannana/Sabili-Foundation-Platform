@@ -510,15 +510,18 @@
 
                                     {{-- استلام الكفالة عن طريق محفظة بال باي: --}}
 
+                                   @if($orphan->wallet_owner)
                                     <div id="receive-wallet">
                                         <label class="mb-2 fw-bold" style="color: var(--primary-color)">  بيانات المحفظة:  </label>
                                         <div class="d-flex align-items-center row mb-3">
 
+                                            @if($orphan->wallet_owner)
                                             <div class="col-12 col-md-6 col-lg-4 mb-4">
                                                 <span class="fw-bold"> اسم صاحب المحفظة </span>
                                                 <span  class="value">  {{$orphan->wallet_owner}} </span>
 
                                             </div>
+                                            @endif
 
                                             @if($orphan->wallet_owner_id_number)
                                                 <div class="col-12 col-md-6 col-lg-4 mb-4">
@@ -537,6 +540,8 @@
                                         </div>
 
                                     </div>
+                                    @endif
+
 
                                 </div>
 

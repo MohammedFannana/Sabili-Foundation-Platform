@@ -30,7 +30,15 @@ class SponsorshipController extends Controller
         $validated = $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'integer|exists:sponsorships,id',
+            'payment_receipt' => ['image' ,'required' , 'dimensions:min_width=100,min_height=100','max:1048576'],
         ]);
+
+
+        if ($request->hasFile('payment_receipt')) {
+            $file = $request->file('payment_receipt');
+            $path = $file->store("images/orphans/Payment receipt", 'public');
+            $validated['payment_receipt'] = $path;
+        }
 
 
         foreach ($validated['ids'] as $id) {
@@ -38,7 +46,7 @@ class SponsorshipController extends Controller
             if ($sponsorship) {
                 $sponsorship->update([
                     'status' => 'تم التسليم',
-                    'start_date' => now()->toDateString(),
+                    'payment_receipt' => $validated['payment_receipt'],
                 ]);
             }
         }

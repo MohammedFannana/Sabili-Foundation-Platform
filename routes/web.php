@@ -14,15 +14,21 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UplodeOrphanController;
 use App\Http\Controllers\Admin\EmployeeController;
 
-Route::get('/' , [HomeController::class , 'index'])->name('home');
+
 
 // action orphan route
 Route::middleware('auth')->group(function () {
 
-    Route::get('/orphans/search', [ActionOrphanController::class, 'search'])->name('orphans.action.search');
+    Route::get('/' , [HomeController::class , 'index'])->name('home');
+
+    Route::post('/orphans/search', [ActionOrphanController::class, 'search'])->name('orphans.action.search');
     Route::post('orphan/approved' , [ActionOrphanController::class , 'approveOrphans'])->name('orphans.action.approve');
     Route::post('orphan/waiting' , [ActionOrphanController::class , 'waitingOrphans'])->name('orphans.action.wait');
     Route::post('orphan/sponsored' , [ActionOrphanController::class , 'sponsorOrphans'])->name('orphans.action.sponsor');
+    Route::post('create/sponsorship' , [ActionOrphanController::class , 'addSponsorship'])->name('sponsorship.create');
+    Route::post('orphan/archived/{id}' , [ActionOrphanController::class , 'archivedOrphan'])->name('orphans.action.archived');
+
+
     Route::post('/orphans/send-email', [ActionOrphanController::class, 'sendEmail'])->name('orphans.email.send');
     Route::delete('orphan/destroy' , [ActionOrphanController::class , 'destroyOrphans'])->name('orphans.action.delete');
 
@@ -32,9 +38,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('orphan/finance' , [FinaceController::class , 'index'])->name('orphans.finance.index');
     Route::post('orphan/finance/delivery/sponsorship/' , [FinaceController::class , 'deliverySponsorship'])->name('orphans.finance.delivery');
+    Route::get('orphan/financial/documents' , [FinaceController::class , 'financialDocuments'])->name('orphans.financial.documents.index');
+    Route::post('orphan/financial/documents' , [FinaceController::class , 'financialDocumentsStore'])->name('orphans.financial.documents.store');
+    Route::get('orphan/financial/documents/{id}' , [FinaceController::class , 'financialDocumentsDownload'])->name('orphans.financial.documents.download');
 
 
-    Route::get('/notification' , [NotificationController::class , 'ShowNotification'])->name('orphan.notification');
+    Route::get('/notification' , [NotificationController::class , 'ShowNotification'])->name('notification');
 
 
 
@@ -46,11 +55,12 @@ Route::middleware('auth')->group(function () {
 
 
     Route::post('orphan/uplode/excel' , [UplodeOrphanController::class , 'uplodeExcel'])->name('orphan.uplode.excel');
-    Route::post('orphan/uplode/access' , [UplodeOrphanController::class , 'uplodeAccess'])->name('orphan.uplode.access');
+    // Route::post('orphan/uplode/access' , [UplodeOrphanController::class , 'uplodeAccess'])->name('orphan.uplode.access');
 
     Route::post('orphan/download/pdf' , [DownloadController::class , 'downloadPdf'])->name('orphan.download.pdf');
     Route::post('orphan/download/excel' , [DownloadController::class , 'downloadExcel'])->name('orphan.download.excel');
-    Route::post('orphan/download/access' , [DownloadController::class , 'downloadAccess'])->name('orphan.download.access');
+    Route::post('statement/download/pdf' , [DownloadController::class , 'downloadPdfStatement'])->name('statement.download.pdf');
+    Route::post('statement/download/excel' , [DownloadController::class , 'downloadExcelStatement'])->name('statement.download.excel');
 
 
     Route::resource('orphan' , OrphanController::class);
@@ -58,7 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::get('orphan/image/show' , [OrphanController::class , 'showImage'])->name('orphan.show.image');
 
 
-    Route::resource('employee' , EmployeeController::class)->middleware(['can:is-admin']);;
+    Route::resource('employee' , EmployeeController::class)->middleware(['can:is-admin']);
 
 });
 
@@ -87,8 +97,8 @@ Route::get('/cache-all', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 

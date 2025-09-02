@@ -20,7 +20,7 @@
         {{-- section header component --}}
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <h3 class="mb-5"> صفحة بيانات الموظف </h3>
-            <a href="{{route('employee.edit' ,$employee->id)}}" class="submit-btn text-decoration-none">تعديل البيانات</a>
+            <a href="{{route('employee.edit' , $employee->id)}}" class="submit-btn text-decoration-none">تعديل البيانات</a>
         </div>
 
         <div class="rounded mt-3" style="border-top-color:#f0fff4 !important">
